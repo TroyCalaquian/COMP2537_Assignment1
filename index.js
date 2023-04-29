@@ -60,6 +60,36 @@ app.get("/", (req, res) => {
   }
 });
 
+app.get('/nosql-injection', async (req,res) => {
+	var username = req.query.user;
+
+	if (!username) {
+		res.send(`<h3>no user provided - try /nosql-injection?user=name</h3> <h3>or /nosql-injection?user[$ne]=name</h3>`);
+		return;
+	}
+	console.log("user: "+username);
+
+	const schema = Joi.string().max(20).required();
+	const validationResult = schema.validate(username);
+
+	//If we didn't use Joi to validate and check for a valid URL parameter below
+	// we could run our userCollection.find and it would be possible to attack.
+	// A URL parameter of user[$ne]=name would get executed as a MongoDB command
+	// and may result in revealing information about all users or a successful
+	// login without knowing the correct password.
+	if (validationResult.error != null) {  
+	   console.log(validationResult.error);
+	   res.send("<h1 style='color:darkred;'>A NoSQL injection attack was detected!!</h1>");
+	   return;
+	}	
+
+	const result = await userCollection.find({username: username}).project({username: 1, password: 1, _id: 1}).toArray();
+
+	console.log(result);
+
+    res.send(`<h1>Hello ${username}</h1>`);
+});
+
 app.get("/signup", (req, res) => {
   var html = `
   create user
@@ -166,10 +196,20 @@ app.get('/members', (req, res) => {
     return;
   }
   var html = `
-  <h1>Hello, ${req.session.username}.</h1>
-
-  <button onclick="location.href='/logout'">Log out</button>
+  <h1>Hello, ${req.session.username}.</h1><br/>
   `;
+
+  let randomNumber = Math.floor(Math.random() * 3) + 1;
+
+  if (randomNumber == 1) {
+    html += `<img src="/Silvia.jpeg" alt="Silvia"/>`;
+  } else if (randomNumber == 2) {
+    html += `<img src="/Rio.jpeg" alt ="Rio"/>`;
+  } else if (randomNumber == 3) {
+    html += `<img src="/Jackie.jpeg" alt="Jackie"/>`;
+  }
+
+  html += `<br/><br/><button onclick="location.href='/logout'">Log out</button>`;
   res.send(html);
 });
 
@@ -177,6 +217,8 @@ app.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect('/');
 });
+
+app.use(express.static(__dirname + "/public"));
 
 app.get("*", (req,res) => {
 	res.status(404);
