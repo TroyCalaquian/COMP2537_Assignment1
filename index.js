@@ -164,7 +164,7 @@ app.post('/loginUser', async (req, res) => {
   if (validationResult.error != null) {
     console.log(validationResult.error);
     var html = `
-    <h1>Invalid email</h1>
+    Invalid email<br/>
     <button onclick="location.href='/login'">Try again</button>
     `;
     res.send(html);
@@ -176,7 +176,7 @@ app.post('/loginUser', async (req, res) => {
   if (result.length != 1) {
     console.log(validationResult.error);
     var html = `
-    <h1>Invalid password combination</h1>
+    Invalid password<br/>
     <button onclick="location.href='/login'">Try again</button>
     `;
     res.send(html);
@@ -192,7 +192,7 @@ app.post('/loginUser', async (req, res) => {
     return;
   } else {
     var html = `
-    <h1>Invalid email</h1>
+    Invalid email/password combination<br/>
     <button onclick="location.href='/login'">Try again</button>
     `;
     res.send(html);
