@@ -176,7 +176,7 @@ app.post('/loginUser', async (req, res) => {
   if (result.length != 1) {
     console.log(validationResult.error);
     var html = `
-    Invalid password<br/>
+    Invalid email<br/>
     <button onclick="location.href='/login'">Try again</button>
     `;
     res.send(html);
