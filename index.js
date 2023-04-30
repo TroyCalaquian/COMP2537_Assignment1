@@ -191,8 +191,13 @@ app.post('/loginUser', async (req, res) => {
     res.redirect('/members');
     return;
   } else {
+    var html = `
+    <h1>Invalid email</h1>
+    <button onclick="location.href='/login'">Try again</button>
+    `;
+    res.send(html);
     console.log("login failed");
-    res.send("login failed");
+    res.send(html);
   }
 });
 
