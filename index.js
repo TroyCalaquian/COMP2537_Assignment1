@@ -164,7 +164,7 @@ app.post('/loginUser', async (req, res) => {
   if (validationResult.error != null) {
     console.log(validationResult.error);
     var html = `
-    <h1>Invalid email/password combination</h1>
+    <h1>Invalid email</h1>
     <button onclick="location.href='/login'">Try again</button>
     `;
     res.send(html);
@@ -173,8 +173,13 @@ app.post('/loginUser', async (req, res) => {
   const result = await userCollection.find({email: email}).project({email: 1, username: 1, password: 1, _id:1}).toArray();
 
   console.log(result);
-  if (result.length == 0) {
-    res.send("user not found");
+  if (result.length != 1) {
+    console.log(validationResult.error);
+    var html = `
+    <h1>Invalid password combination</h1>
+    <button onclick="location.href='/login'">Try again</button>
+    `;
+    res.send(html);
   }
 
   if (await bcrypt.compare(password, result[0].password)) {
